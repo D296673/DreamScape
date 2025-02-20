@@ -35,11 +35,11 @@ namespace DreamScape.Data
              .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<User>().HasData(
-                new User { Id = 1, Username = "ShadowSlayer", Password = "Test123!", Role = "Speler", Email = "shadow@example.com" },
-                new User { Id = 2, Username = "MysticMage", Password = "Mage2024", Role = "Speler", Email = "mystic@example.com" },
-                new User { Id = 3, Username = "DragonKnight", Password = "Dragon!99", Role = "Speler", Email = "dragon@example.com" },
-                new User { Id = 4, Username = "AdminMaster", Password = "Admin007", Role = "Beheerder", Email = "admin@example.com" },
-                new User { Id = 5, Username = "ThunderRogue", Password = "Thund3r!!", Role = "Speler", Email = "thunder@example.com" }
+                new User { Id = 1, Username = "ShadowSlayer", Password = SecureHasher.Hash("Test123!"), Role = "Speler", Email = "shadow@example.com" },
+                new User { Id = 2, Username = "MysticMage", Password = SecureHasher.Hash("Mage2024"), Role = "Speler", Email = "mystic@example.com" },
+                new User { Id = 3, Username = "DragonKnight", Password = SecureHasher.Hash("Dragon!99"), Role = "Speler", Email = "dragon@example.com" },
+                new User { Id = 4, Username = "AdminMaster", Password = SecureHasher.Hash("Admin007"), Role = "Beheerder", Email = "admin@example.com" },
+                new User { Id = 5, Username = "ThunderRogue", Password = SecureHasher.Hash("Thund3r!!"), Role = "Speler", Email = "thunder@example.com" }
             );
 
             modelBuilder.Entity<Item>().HasData(

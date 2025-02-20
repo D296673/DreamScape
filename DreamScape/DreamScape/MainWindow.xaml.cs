@@ -33,7 +33,7 @@ namespace DreamScape
                 db.Database.EnsureCreated();
             }
 
-            MainFrame.Navigate(typeof(mainpage));
+            MainFrame.Navigate(typeof(LoginPage));
         }
 
         

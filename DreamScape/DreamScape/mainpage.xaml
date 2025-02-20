@@ -9,7 +9,43 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
+        <TextBlock Text="Main Menu" 
+                FontSize="28" 
+                FontWeight="Bold" 
+                HorizontalAlignment="Center"
+                Margin="0,10,0,30"
+                Grid.Row="0" />
+
+        <Button Content="Inventory" 
+            Width="200" 
+            Height="50" 
+            Grid.Row="1"
+            HorizontalAlignment="Center"
+            Click="InventoryButton_Click" />
+
+        <Button Content="Weapons" 
+            Width="200" 
+            Height="50" 
+            Grid.Row="2"
+            HorizontalAlignment="Center"
+            Margin="0,10,0,0"
+            Click="WeaponsButton_Click" />
+
+        <Button Content="Trading" 
+            Width="200" 
+            Height="50" 
+            Grid.Row="3"
+            HorizontalAlignment="Center"
+            Margin="0,10,0,0"
+            Click="TradingButton_Click" />
     </Grid>
 </Page>
+

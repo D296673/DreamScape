@@ -1,3 +1,4 @@
+using DreamScape.Data;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -21,35 +22,42 @@ namespace DreamScape
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class mainpage : Page
+    public sealed partial class Trading : Page
     {
+        private List<Trade> TradeRequest;
         private object userId;
-        public mainpage()
+        public Trading()
         {
             this.InitializeComponent();
+
         }
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
 
-            if (e.Parameter != null)
+            if (e.Parameter is int UserId)
             {
-                userId = e.Parameter;
+                LoadTradeRequest(UserId);
             }
         }
-        private void InventoryButton_Click(object sender, RoutedEventArgs e)
+        private void LoadTradeRequest(int UserId)
         {
-            this.Frame.Navigate(typeof(InventoryPage), userId);
-        }
+            using (var db = new AppDbContext())
+            {
 
-        private void WeaponsButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.Frame.Navigate(typeof(AllweaponsPage));
-        }
+                TradeRequest = db.Trades
+                         .Where(i => i.ReceiverId == UserId)
+                         .ToList();
+            }
 
-        private void TradingButton_Click(object sender, RoutedEventArgs e)
+            TradeRequestsListView.ItemsSource = TradeRequest;
+        }
+        private void CreateTradeRequestButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Frame.Navigate(typeof(Trading), userId);
+        }
+         private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.GoBack();
         }
 
     }

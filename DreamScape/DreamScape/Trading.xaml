@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="DreamScape.Trading"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:DreamScape.Data"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <!-- Top Section with Buttons -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+            <Button Content="Create Trade Request" Width="200" Height="40" Click="CreateTradeRequestButton_Click"/>
+            <Button Content="Back" Width="100" Height="40" Margin="10,0,0,0" Click="BackButton_Click"/>
+        </StackPanel>
+
+        <!-- Line Separator -->
+        <Border Height="1" Background="Gray" Margin="20"/>
+
+        <!-- ListView for displaying Trade Requests -->
+        <ListView Name="TradeRequestsListView" Margin="20,40,20,0">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="local:Trade">
+                    <StackPanel Margin="10" Padding="5" Background="LightGray" BorderBrush="Gray" BorderThickness="1" CornerRadius="5">
+                        <TextBlock Text="{Binding Sender}" FontSize="16" FontWeight="Bold" Foreground="Black"/>
+                        <TextBlock Text="{Binding Receiver}" FontSize="14" Foreground="Gray" Margin="0,5,0,0"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</Page>
