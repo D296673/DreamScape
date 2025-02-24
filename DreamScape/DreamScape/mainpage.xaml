@@ -17,6 +17,31 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <!-- User Profile Button -->
+        <Button x:Name="UserProfileButton" Width="50" Height="50" HorizontalAlignment="Left" VerticalAlignment="Top"
+                Margin="10" Background="Transparent" PointerEntered="UserProfileButton_PointerEntered">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <Ellipse Width="50" Height="50">
+                            <Ellipse.Fill>
+                                <ImageBrush ImageSource="Assets/user.png" />
+                            </Ellipse.Fill>
+                        </Ellipse>
+                    </Grid>
+                </ControlTemplate>
+            </Button.Template>
+            <FlyoutBase.AttachedFlyout>
+                <Flyout Placement="Bottom">
+                    <StackPanel Padding="10">
+                        <TextBlock x:Name="NameTextBlock" Text="Username: JohnDoe" FontWeight="Bold"/>
+                        <TextBlock x:Name="RoleTextBlock" Text="Role: Speler" />
+                        <Button Content="Logout" Click="LogoutButton_Click" />
+                    </StackPanel>
+                </Flyout>
+            </FlyoutBase.AttachedFlyout>
+        </Button>
+
         <TextBlock Text="Main Menu" 
                 FontSize="28" 
                 FontWeight="Bold" 
@@ -48,4 +73,6 @@
             Click="TradingButton_Click" />
     </Grid>
 </Page>
+
+
 

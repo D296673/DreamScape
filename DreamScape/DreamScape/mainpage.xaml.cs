@@ -1,3 +1,4 @@
+using DreamScape.Data;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -23,7 +24,8 @@ namespace DreamScape
     /// </summary>
     public sealed partial class mainpage : Page
     {
-        private object userId;
+        private int userId;
+        private User user;
         public mainpage()
         {
             this.InitializeComponent();
@@ -34,8 +36,41 @@ namespace DreamScape
 
             if (e.Parameter != null)
             {
-                userId = e.Parameter;
+                if (int.TryParse(e.Parameter.ToString(), out int parsedUserId))
+                {
+                    userId = parsedUserId; 
+
+                    using (var db = new AppDbContext())
+                    {
+                        user = db.Users.FirstOrDefault(u => u.Id == userId);
+                        NameTextBlock.Text = user.Username;
+                        RoleTextBlock.Text = $"Role: {user.Role}";
+                    }
+                }
             }
+        }
+        private async void LogoutButton_Click(object sender, RoutedEventArgs e)
+        {
+            ContentDialog logoutDialog = new ContentDialog
+            {
+                Title = "Logout",
+                Content = "Are you sure you want to log out?",
+                PrimaryButtonText = "Yes",
+                CloseButtonText = "Cancel",
+                XamlRoot = this.XamlRoot 
+            };
+
+            ContentDialogResult result = await logoutDialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                Frame.Navigate(typeof(LoginPage)); 
+            }
+        }
+
+        private void UserProfileButton_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
         }
         private void InventoryButton_Click(object sender, RoutedEventArgs e)
         {
