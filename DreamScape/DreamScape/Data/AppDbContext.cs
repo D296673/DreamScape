@@ -30,16 +30,16 @@ namespace DreamScape.Data
 
             modelBuilder.Entity<Trade>()
              .HasOne(t => t.Receiver)
-             .WithMany(u => u.ReceivedTrades) // If User has a list of received trades
+             .WithMany(u => u.ReceivedTrades) 
              .HasForeignKey(t => t.ReceiverId)
              .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<User>().HasData(
-                new User { Id = 1, Username = "ShadowSlayer", Password = SecureHasher.Hash("Test123!"), Role = "Speler", Email = "shadow@example.com" },
-                new User { Id = 2, Username = "MysticMage", Password = SecureHasher.Hash("Mage2024"), Role = "Speler", Email = "mystic@example.com" },
-                new User { Id = 3, Username = "DragonKnight", Password = SecureHasher.Hash("Dragon!99"), Role = "Speler", Email = "dragon@example.com" },
-                new User { Id = 4, Username = "AdminMaster", Password = SecureHasher.Hash("Admin007"), Role = "Beheerder", Email = "admin@example.com" },
-                new User { Id = 5, Username = "ThunderRogue", Password = SecureHasher.Hash("Thund3r!!"), Role = "Speler", Email = "thunder@example.com" }
+                new User { Id = 1, Username = "ShadowSlayer", Password = SecureHasher.Hash("Test123!"), Role = "Speler", Email = "shadow@example.com", IsAdmin = false },
+                new User { Id = 2, Username = "MysticMage", Password = SecureHasher.Hash("Mage2024"), Role = "Speler", Email = "mystic@example.com", IsAdmin = false },
+                new User { Id = 3, Username = "DragonKnight", Password = SecureHasher.Hash("Dragon!99"), Role = "Speler", Email = "dragon@example.com", IsAdmin = false },
+                new User { Id = 4, Username = "AdminMaster", Password = SecureHasher.Hash("Admin007"), Role = "Beheerder", Email = "admin@example.com", IsAdmin= true },
+                new User { Id = 5, Username = "ThunderRogue", Password = SecureHasher.Hash("Thund3r!!"), Role = "Speler", Email = "thunder@example.com", IsAdmin= false }
             );
 
             modelBuilder.Entity<Item>().HasData(

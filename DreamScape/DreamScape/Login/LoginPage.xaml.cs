@@ -1,4 +1,5 @@
 using DreamScape.Data;
+using DreamScape.Login;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -56,8 +57,15 @@ namespace DreamScape
                     if (user != null)
                     {
                         int userId = user.Id; 
-
-                        Frame.Navigate(typeof(mainpage), userId);
+                        if (user.Role == "Speler")
+                        {
+                            Frame.Navigate(typeof(mainpage), userId);
+                        }
+                        if (user.Role == "Beheerder")
+                        {
+                            Frame.Navigate(typeof(ControlPage), userId);
+                        }
+                        
                     }
                 }
             }

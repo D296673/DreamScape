@@ -13,9 +13,14 @@
     <EnableMsixTooling>true</EnableMsixTooling>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Admin\AllItemsAdmin.xaml" />
+    <None Remove="Admin\CreateItem.xaml" />
+    <None Remove="Admin\UserPage.xaml" />
     <None Remove="AllweaponsPage.xaml" />
+    <None Remove="ControlPage.xaml" />
     <None Remove="InventoryPage.xaml" />
     <None Remove="LoginPage.xaml" />
+    <None Remove="mainpage - Copy.xaml" />
     <None Remove="mainpage.xaml" />
     <None Remove="RegisterPage.xaml" />
     <None Remove="Trading.xaml" />
@@ -47,6 +52,14 @@
     <ProjectCapability Include="Msix" />
   </ItemGroup>
   <ItemGroup>
+    <Page Update="ControlPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="mainpage - Copy.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
     <Page Update="Trading.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -76,6 +89,24 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="User\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Admin\UserPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Admin\CreateItem.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Admin\AllItemsAdmin.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
 
   <!--
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution
@@ -87,6 +118,7 @@
   </PropertyGroup>
         <PropertyGroup>
             <WindowsSdkPackageVersion>10.0.19041.38</WindowsSdkPackageVersion>
+            <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
         </PropertyGroup>
 
 </Project>

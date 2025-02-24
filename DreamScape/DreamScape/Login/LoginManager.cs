@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
 
-namespace DreamScape
+namespace DreamScape.Login
 {
     public static class LoginManager
     {
