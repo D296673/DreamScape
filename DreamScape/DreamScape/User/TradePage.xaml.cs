@@ -9,6 +9,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -31,7 +32,7 @@ namespace DreamScape.User
         public TradePage()
         {
             this.InitializeComponent();
-            LoadTrades();
+            
         }
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
@@ -39,6 +40,7 @@ namespace DreamScape.User
             if (e.Parameter is int userId)
             {
                 _currentUserId = userId;
+                LoadTrades();
             }
         }
 
@@ -47,7 +49,7 @@ namespace DreamScape.User
             using (var context = new AppDbContext())
             {
                 var trades = await context.Trades
-                    .Where(t => t.ReceiverId == _currentUserId && t.Status == "Pending")
+                    .Where(t => t.ReceiverId == _currentUserId && t.Status == "Pending" && t.IsSend == true)
                     .Include(t => t.Sender)
                     .ToListAsync();
 
@@ -55,14 +57,94 @@ namespace DreamScape.User
             }
         }
 
-        private void ViewTrade_Click(object sender, RoutedEventArgs e)
+
+        private async void ViewTrade_Click(object sender, RoutedEventArgs e)
         {
             if (TradesList.SelectedItem is Trade selectedTrade)
             {
-                // Navigeer naar een pagina om de trade te bekijken (nog te maken)
-                //Frame.Navigate(typeof(ViewTradePage), selectedTrade.Id);
+                using (var context = new AppDbContext())
+                {
+                    var trade = await context.Trades.FindAsync(selectedTrade.Id);
+                    if (trade == null) return;
+
+                    var tradeItems = await context.TradeItems
+                        .Where(ti => ti.TradeId == trade.Id)
+                        .Include(ti => ti.Item)
+                        .Include(ti => ti.Owner)
+                        .ToListAsync();
+
+                    var Sender = await context.Users.FindAsync(trade.SenderId);
+                    var receiver = await context.Users.FindAsync(trade.ReceiverId);
+
+                    if (Sender == null || receiver == null) return;
+
+                    var itemsToReceive = tradeItems
+                        .Where(ti => ti.Owner.Id != _currentUserId)
+                        .Select(ti => ti.Item.Name)
+                        .ToList();
+
+                    var itemsToGive = tradeItems
+                        .Where(ti => ti.Owner.Id == _currentUserId)
+                        .Select(ti => ti.Item.Name)
+                        .ToList();
+
+                    StackPanel contentPanel = new StackPanel();
+                    contentPanel.Children.Add(new TextBlock { Text = "Items you will receive:" });
+                    contentPanel.Children.Add(new TextBlock { Text = string.Join(", ", itemsToReceive) });
+
+                    contentPanel.Children.Add(new TextBlock { Text = "Items you will give:" });
+                    contentPanel.Children.Add(new TextBlock { Text = string.Join(", ", itemsToGive) });
+
+                    ContentDialog tradeDialog = new ContentDialog
+                    {
+                        Title = "Trade Details",
+                        Content = contentPanel,
+                        PrimaryButtonText = "Accept",
+                        CloseButtonText = "Decline"
+                    };
+
+                    tradeDialog.XamlRoot = this.Content.XamlRoot;
+                    ContentDialogResult result = await tradeDialog.ShowAsync();
+
+                    if (result == ContentDialogResult.Primary)
+                    {
+                        // Swap items in Inventory table
+                        foreach (var tradeItem in tradeItems)
+                        {
+                            var inventoryItem = await context.Inventories
+                                .FirstOrDefaultAsync(inv => inv.ItemId == tradeItem.Item.Id && inv.UserId == tradeItem.Owner.Id);
+
+                            if (inventoryItem != null)
+                            {
+                                inventoryItem.UserId = tradeItem.Owner.Id == Sender.Id ? receiver.Id : Sender.Id;
+                            }
+                            else
+                            {
+                                // Add item to new owner's inventory
+                                context.Inventories.Add(new Inventory
+                                {
+                                    UserId = tradeItem.Owner.Id == Sender.Id ? receiver.Id : Sender.Id,
+                                    ItemId = tradeItem.Item.Id,
+                                    Quantity = 1
+                                });
+                            }
+                        }
+
+                        trade.Status = "Completed"; // Mark trade as completed
+                    }
+                    else
+                    {
+                        trade.Status = "Declined"; // Mark trade as declined
+                    }
+
+                    context.Trades.Update(trade); // Ensure Entity Framework detects the update
+                    await context.SaveChangesAsync();
+                }
             }
         }
+
+
+
 
         private async void OpenTradeDialog(object sender, RoutedEventArgs e)
         {
@@ -104,7 +186,13 @@ namespace DreamScape.User
 
                         var tradeId = trade.Id;
 
-                        Frame.Navigate(typeof(CreateTradePage), new { CurrentUserId = _currentUserId, SelectedUserId = selectedUser.Id, TradeId = tradeId });
+                        Frame.Navigate(typeof(CreateTradePage), new Dictionary<string, object>
+                        {
+                            { "CurrentUserId", _currentUserId },
+                            { "SelectedUserId", selectedUser.Id },
+                            { "TradeId", tradeId }
+                        });
+
                     }
                 }
             }
@@ -119,6 +207,10 @@ namespace DreamScape.User
                     .Where(u => u.Id != _currentUserId)  
                     .ToListAsync();
             }
+        }
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.GoBack();
         }
     }
 }

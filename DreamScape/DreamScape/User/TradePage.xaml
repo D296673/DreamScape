@@ -13,19 +13,20 @@
         <StackPanel>
             <TextBlock Text="Jouw Trades" FontSize="24" FontWeight="Bold" Margin="0,0,0,10"/>
 
-            <ListView x:Name="TradesList">
+            <ListView x:Name="TradesList" IsItemClickEnabled="True" ItemClick="ViewTrade_Click">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <TextBlock Text="{Binding Sender.Username}" FontWeight="Bold"/>
                             <TextBlock Text="wil een trade met je doen."/>
-                            <Button Content="Bekijken" Click="ViewTrade_Click"/>
+                            
                         </StackPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
 
             <Button Content="Nieuwe Trade Maken" Click="OpenTradeDialog" Margin="0,10,0,0"/>
+            <Button Content="Back" Width="100" Margin="5" Click="BackButton_Click"/>
         </StackPanel>
     </Grid>
 </Page>
