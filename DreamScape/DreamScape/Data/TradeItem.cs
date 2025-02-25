@@ -11,7 +11,8 @@ namespace DreamScape.Data
         public int Id { get; set; } 
         public int TradeId { get; set; } 
         public int ItemId { get; set; } 
-        public int Quantity { get; set; } 
+        public int Quantity { get; set; }
+        public User OwnerId { get; set; }
         public Trade Trade { get; set; }
         public Item Item { get; set; }
     }

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
@@ -24,6 +24,8 @@
     <None Remove="mainpage.xaml" />
     <None Remove="RegisterPage.xaml" />
     <None Remove="Trading.xaml" />
+    <None Remove="User\CreateTradePage.xaml" />
+    <None Remove="User\TradePage.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -50,6 +52,11 @@
   -->
   <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <ProjectCapability Include="Msix" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="User\CreateTradePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="ControlPage.xaml">
@@ -90,7 +97,9 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="User\" />
+    <Page Update="User\TradePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Admin\UserPage.xaml">

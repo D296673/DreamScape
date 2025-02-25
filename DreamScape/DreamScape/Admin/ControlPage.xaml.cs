@@ -26,7 +26,7 @@ namespace DreamScape
     public sealed partial class ControlPage : Page
     {
         private int userId;
-        private User user;
+        private DreamScape.Data.User user;
         public ControlPage()
         {
             this.InitializeComponent();

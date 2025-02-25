@@ -1,4 +1,5 @@
 using DreamScape.Data;
+using DreamScape.Data;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -36,7 +37,7 @@ namespace DreamScape
             string email = EmailTextBox.Text;
             if (hashed != null || name != null || email != null)
             {
-                var user = new User
+                var user = new Data.User
                 {
                     Username = name,
                     Password = hashed,

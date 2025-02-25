@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,5 +19,6 @@ namespace DreamScape.Data
         public ICollection<Inventory> Inventories { get; set; }
         public ICollection<Trade> SentTrades { get; set; }
         public ICollection<Trade> ReceivedTrades { get; set; }
+        public ICollection<TradeItem> ItemOwner { get; set; }
     }
 }

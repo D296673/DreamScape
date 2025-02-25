@@ -1,4 +1,5 @@
 using DreamScape.Data;
+using DreamScape.User;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -25,7 +26,7 @@ namespace DreamScape
     public sealed partial class mainpage : Page
     {
         private int userId;
-        private User user;
+        private DreamScape.Data.User user;
         public mainpage()
         {
             this.InitializeComponent();
@@ -84,7 +85,7 @@ namespace DreamScape
 
         private void TradingButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Frame.Navigate(typeof(Trading), userId);
+            this.Frame.Navigate(typeof(TradePage), userId);
         }
 
     }

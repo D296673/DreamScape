@@ -11,7 +11,7 @@ namespace DreamScape.Data
         public int Id { get; set; }
         public string Status { get; set; } 
         public DateTime TradeDate { get; set; }
-
+        public bool IsSend { get; set; }
         public int SenderId { get; set; }
         public User Sender { get; set; }
         public int ReceiverId {  get; set; }

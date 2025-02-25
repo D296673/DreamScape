@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="DreamScape.User.TradePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:DreamScape.User"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid Padding="20">
+        <StackPanel>
+            <TextBlock Text="Jouw Trades" FontSize="24" FontWeight="Bold" Margin="0,0,0,10"/>
+
+            <ListView x:Name="TradesList">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="{Binding Sender.Username}" FontWeight="Bold"/>
+                            <TextBlock Text="wil een trade met je doen."/>
+                            <Button Content="Bekijken" Click="ViewTrade_Click"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <Button Content="Nieuwe Trade Maken" Click="OpenTradeDialog" Margin="0,10,0,0"/>
+        </StackPanel>
+    </Grid>
+</Page>
