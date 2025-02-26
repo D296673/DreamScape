@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.System;
+using Microsoft.UI;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -99,36 +100,20 @@ namespace DreamScape.User
         private async void SenderItemsList_ItemClick(object sender, ItemClickEventArgs e)
         {
             var clickedItem = e.ClickedItem as Item;
+            if (clickedItem == null) return;
 
-            if (clickedItem != null)
+            using (var context = new AppDbContext())
             {
-                using (var context = new AppDbContext())
-                {
-                    var user = context.Users.Where(u => u.Id == _currentUserId).FirstOrDefault();
-                    var tradeItem = new TradeItem
-                    {
-                        TradeId = _tradeId,
-                        ItemId = clickedItem.Id,
-                        Quantity = 1,
-                        Owner = user, 
-                    };
+                var existingTradeItem = await context.TradeItems
+                    .FirstOrDefaultAsync(ti => ti.TradeId == _tradeId && ti.ItemId == clickedItem.Id && ti.Owner.Id == _currentUserId);
 
-                    context.TradeItems.Add(tradeItem);
-                    await context.SaveChangesAsync(); 
+                if (existingTradeItem != null)
+                {
+                    context.TradeItems.Remove(existingTradeItem);
                 }
-            }
-        }
-
-
-        private async void ReceiverItemsList_ItemClick(object sender, ItemClickEventArgs e)
-        {
-            var clickedItem = e.ClickedItem as Item;
-
-            if (clickedItem != null)
-            {
-                using (var context = new AppDbContext())
+                else
                 {
-                    var user = context.Users.Where(u => u.Id == _selectedUserId).FirstOrDefault();
+                    var user = await context.Users.FindAsync(_currentUserId);
                     var tradeItem = new TradeItem
                     {
                         TradeId = _tradeId,
@@ -136,12 +121,51 @@ namespace DreamScape.User
                         Quantity = 1,
                         Owner = user,
                     };
-
                     context.TradeItems.Add(tradeItem);
-                    await context.SaveChangesAsync();
                 }
+
+                await context.SaveChangesAsync();
             }
+            UpdateItemBorders(); 
         }
+
+
+
+
+
+        private async void ReceiverItemsList_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var clickedItem = e.ClickedItem as Item;
+            if (clickedItem == null) return;
+
+            using (var context = new AppDbContext())
+            {
+                var existingTradeItem = await context.TradeItems
+                    .FirstOrDefaultAsync(ti => ti.TradeId == _tradeId && ti.ItemId == clickedItem.Id && ti.Owner.Id == _selectedUserId);
+
+                if (existingTradeItem != null)
+                {
+                    context.TradeItems.Remove(existingTradeItem);
+                }
+                else
+                {
+                    var user = await context.Users.FindAsync(_selectedUserId);
+                    var tradeItem = new TradeItem
+                    {
+                        TradeId = _tradeId,
+                        ItemId = clickedItem.Id,
+                        Quantity = 1,
+                        Owner = user,
+                    };
+                    context.TradeItems.Add(tradeItem);
+                }
+
+                await context.SaveChangesAsync();
+            }
+            UpdateItemBorders(); 
+        }
+
+
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             Frame.GoBack();
@@ -153,7 +177,6 @@ namespace DreamScape.User
             
                 using (var context = new AppDbContext())
                 {
-                    // Haal de trade uit de database
                     var trade = await context.Trades
                                               .Where(t => t.Id == _tradeId)
                                               .FirstOrDefaultAsync();
@@ -168,5 +191,42 @@ namespace DreamScape.User
                 }
             
         }
+
+
+        private async void UpdateItemBorders()
+        {
+            using (var context = new AppDbContext())
+            {
+                var tradeItems = await context.TradeItems
+                    .Where(ti => ti.TradeId == _tradeId)
+                    .Select(ti => new { ti.ItemId, OwnerId = ti.Owner.Id }) 
+                    .ToListAsync();
+
+                foreach (var item in SenderItemsList.Items)
+                {
+                    var container = (ListViewItem)SenderItemsList.ContainerFromItem(item);
+                    if (container != null)
+                    {
+                        var border = (Border)container.ContentTemplateRoot;
+                        var itemData = item as Item;
+                        bool isInTrade = tradeItems.Any(ti => ti.ItemId == itemData.Id && ti.OwnerId == _currentUserId);
+                        border.BorderBrush = new SolidColorBrush(isInTrade ? Colors.Green : Colors.Transparent);
+                    }
+                }
+
+                foreach (var item in ReceiverItemsList.Items)
+                {
+                    var container = (ListViewItem)ReceiverItemsList.ContainerFromItem(item);
+                    if (container != null)
+                    {
+                        var border = (Border)container.ContentTemplateRoot;
+                        var itemData = item as Item;
+                        bool isInTrade = tradeItems.Any(ti => ti.ItemId == itemData.Id && ti.OwnerId == _selectedUserId);
+                        border.BorderBrush = new SolidColorBrush(isInTrade ? Colors.Green : Colors.Transparent);
+                    }
+                }
+            }
+        }
+
     }
 }

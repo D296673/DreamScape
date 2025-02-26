@@ -1,5 +1,6 @@
 using DreamScape.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -14,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Contacts;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
@@ -62,89 +64,130 @@ namespace DreamScape.User
         {
             if (TradesList.SelectedItem is Trade selectedTrade)
             {
-                using (var context = new AppDbContext())
+                if (selectedTrade.Status == "Pending")
                 {
-                    var trade = await context.Trades.FindAsync(selectedTrade.Id);
-                    if (trade == null) return;
-
-                    var tradeItems = await context.TradeItems
-                        .Where(ti => ti.TradeId == trade.Id)
-                        .Include(ti => ti.Item)
-                        .Include(ti => ti.Owner)
-                        .ToListAsync();
-
-                    var Sender = await context.Users.FindAsync(trade.SenderId);
-                    var receiver = await context.Users.FindAsync(trade.ReceiverId);
-
-                    if (Sender == null || receiver == null) return;
-
-                    var itemsToReceive = tradeItems
-                        .Where(ti => ti.Owner.Id != _currentUserId)
-                        .Select(ti => ti.Item.Name)
-                        .ToList();
-
-                    var itemsToGive = tradeItems
-                        .Where(ti => ti.Owner.Id == _currentUserId)
-                        .Select(ti => ti.Item.Name)
-                        .ToList();
-
-                    StackPanel contentPanel = new StackPanel();
-                    contentPanel.Children.Add(new TextBlock { Text = "Items you will receive:" });
-                    contentPanel.Children.Add(new TextBlock { Text = string.Join(", ", itemsToReceive) });
-
-                    contentPanel.Children.Add(new TextBlock { Text = "Items you will give:" });
-                    contentPanel.Children.Add(new TextBlock { Text = string.Join(", ", itemsToGive) });
-
-                    ContentDialog tradeDialog = new ContentDialog
+                    using (var context = new AppDbContext())
                     {
-                        Title = "Trade Details",
-                        Content = contentPanel,
-                        PrimaryButtonText = "Accept",
-                        CloseButtonText = "Decline"
-                    };
+                        var trade = await context.Trades.FindAsync(selectedTrade.Id);
+                        if (trade == null || trade.Status != "Pending") return; 
 
-                    tradeDialog.XamlRoot = this.Content.XamlRoot;
-                    ContentDialogResult result = await tradeDialog.ShowAsync();
+                        var tradeItems = await context.TradeItems
+                            .Where(ti => ti.TradeId == trade.Id)
+                            .Include(ti => ti.Item)
+                            .Include(ti => ti.Owner)
+                            .ToListAsync();
 
-                    if (result == ContentDialogResult.Primary)
-                    {
-                        // Swap items in Inventory table
-                        foreach (var tradeItem in tradeItems)
+                        var Sender = await context.Users.FindAsync(trade.SenderId);
+                        var receiver = await context.Users.FindAsync(trade.ReceiverId);
+
+                        if (Sender == null || receiver == null) return;
+
+                        var itemsToReceive = tradeItems
+                            .Where(ti => ti.Owner.Id != _currentUserId)
+                            .Select(ti => ti.Item.Name)
+                            .ToList();
+
+                        var itemsToGive = tradeItems
+                            .Where(ti => ti.Owner.Id == _currentUserId)
+                            .Select(ti => ti.Item.Name)
+                            .ToList();
+
+                        StackPanel contentPanel = new StackPanel { Spacing = 10 };
+
+                        Grid tradeGrid = new Grid
                         {
-                            var inventoryItem = await context.Inventories
-                                .FirstOrDefaultAsync(inv => inv.ItemId == tradeItem.Item.Id && inv.UserId == tradeItem.Owner.Id);
+                            ColumnDefinitions =
+                            {
+                                new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
+                                new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }
+                            }
+                        };
 
-                            if (inventoryItem != null)
+                        StackPanel senderPanel = new StackPanel();
+                        senderPanel.Children.Add(new TextBlock { Text = "Jij", FontSize = 18, FontWeight = FontWeights.Bold, Margin = new Thickness(0, 0, 0, 5) });
+
+                        ListView senderList = new ListView
+                        {
+                            ItemsSource = itemsToGive,
+                            Height = 100
+                        };
+                        senderPanel.Children.Add(senderList);
+                        Grid.SetColumn(senderPanel, 0);
+                        tradeGrid.Children.Add(senderPanel);
+
+                        StackPanel receiverPanel = new StackPanel();
+                        receiverPanel.Children.Add(new TextBlock { Text = "Ontvanger", FontSize = 18, FontWeight = FontWeights.Bold, Margin = new Thickness(0, 0, 0, 5) });
+
+                        ListView receiverList = new ListView
+                        {
+                            ItemsSource = itemsToReceive,
+                            Height = 100
+                        };
+                        receiverPanel.Children.Add(receiverList);
+                        Grid.SetColumn(receiverPanel, 1);
+                        tradeGrid.Children.Add(receiverPanel);
+
+                        contentPanel.Children.Add(tradeGrid);
+
+                        ContentDialog tradeDialog = new ContentDialog
+                        {
+                            Title = "Trade Details",
+                            Content = contentPanel,
+                            PrimaryButtonText = "Accept",
+                            CloseButtonText = "Decline"
+                        };
+
+                        tradeDialog.XamlRoot = this.Content.XamlRoot;
+                        ContentDialogResult result = await tradeDialog.ShowAsync();
+
+
+                        if (result == ContentDialogResult.Primary)
+                        {
+                            foreach (var tradeItem in tradeItems)
                             {
-                                inventoryItem.UserId = tradeItem.Owner.Id == Sender.Id ? receiver.Id : Sender.Id;
-                            }
-                            else
-                            {
-                                // Add item to new owner's inventory
-                                context.Inventories.Add(new Inventory
+                                var inventoryItem = await context.Inventories
+                                    .FirstOrDefaultAsync(inv => inv.ItemId == tradeItem.Item.Id && inv.UserId == tradeItem.Owner.Id);
+
+                                if (inventoryItem != null)
                                 {
-                                    UserId = tradeItem.Owner.Id == Sender.Id ? receiver.Id : Sender.Id,
-                                    ItemId = tradeItem.Item.Id,
-                                    Quantity = 1
-                                });
+                                    inventoryItem.UserId = tradeItem.Owner.Id == Sender.Id ? receiver.Id : Sender.Id;
+                                }
+                                else
+                                {
+                                    context.Inventories.Add(new Inventory
+                                    {
+                                        UserId = tradeItem.Owner.Id == Sender.Id ? receiver.Id : Sender.Id,
+                                        ItemId = tradeItem.Item.Id,
+                                        Quantity = 1
+                                    });
+                                }
                             }
+
+                            trade.Status = "Completed";
+                        }
+                        else
+                        {
+                            trade.Status = "Declined";
                         }
 
-                        trade.Status = "Completed"; // Mark trade as completed
-                    }
-                    else
-                    {
-                        trade.Status = "Declined"; // Mark trade as declined
+                        context.Trades.Update(trade);
+                        await context.SaveChangesAsync();
+
+                        selectedTrade.Status = trade.Status;
                     }
 
-                    context.Trades.Update(trade); // Ensure Entity Framework detects the update
-                    await context.SaveChangesAsync();
+                    ContentDialog tradeDialog1 = new ContentDialog
+                    {
+                        Title = "Trade Details",
+                        Content = $"This trade has been {selectedTrade.Status}",
+                        CloseButtonText = "OK"
+                    };
+
+                    tradeDialog1.XamlRoot = this.Content.XamlRoot;
+                    await tradeDialog1.ShowAsync(); 
                 }
             }
         }
-
-
-
 
         private async void OpenTradeDialog(object sender, RoutedEventArgs e)
         {

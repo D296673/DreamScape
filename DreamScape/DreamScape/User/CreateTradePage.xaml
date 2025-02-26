@@ -27,7 +27,12 @@
                 <ListView x:Name="SenderItemsList" IsItemClickEnabled="True" ItemClick="SenderItemsList_ItemClick">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Name}"/>
+                            <Border BorderThickness="2" Padding="5">
+                                <Border.BorderBrush>
+                                    <SolidColorBrush x:Name="ItemBorder" Color="Transparent" />
+                                </Border.BorderBrush>
+                                <TextBlock Text="{Binding Name}" />
+                            </Border>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
@@ -42,7 +47,12 @@
                 <ListView x:Name="ReceiverItemsList" IsItemClickEnabled="True" ItemClick="ReceiverItemsList_ItemClick">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Name}"/>
+                            <Border BorderThickness="2" Padding="5">
+                                <Border.BorderBrush>
+                                    <SolidColorBrush x:Name="ItemBorder" Color="Transparent" />
+                                </Border.BorderBrush>
+                                <TextBlock Text="{Binding Name}" />
+                            </Border>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>

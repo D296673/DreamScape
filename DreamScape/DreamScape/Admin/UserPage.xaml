@@ -11,12 +11,10 @@
 
     <Grid Padding="20">
         <StackPanel>
-            <!-- Back Button -->
             <Button Content="Back" Click="BackButton_Click" Width="100" Margin="0,0,0,20"/>
 
             <TextBlock Text="User Management" FontSize="24" Margin="0,0,0,20" HorizontalAlignment="Center"/>
 
-            <!-- List of Users -->
             <ListView x:Name="UsersListView" SelectionMode="Single">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="local:User">
@@ -24,20 +22,15 @@
                             <TextBlock Text="{x:Bind Username}" Width="150"/>
                             <TextBlock Text="{x:Bind Role}" Width="150"/>
 
-                            <!-- Change Role Button -->
                             <Button Content="Change Role" Click="ChangeRole_Click" Width="100" Margin="5"/>
 
-                            <!-- Delete User Button -->
                             <Button Content="Delete" Click="DeleteUser_Click" Width="80" Margin="5"/>
 
-                            <!-- Add Item Button -->
                             <Button Content="Add Item" Click="AddItemToUser_Click" Width="100" Margin="5"/>
                         </StackPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-
-            <!-- Item Dropdown (optional) -->
             <ComboBox x:Name="ItemComboBox" Width="200" Margin="10" />
         </StackPanel>
     </Grid>
